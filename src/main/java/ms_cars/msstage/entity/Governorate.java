@@ -2,12 +2,19 @@ package ms_cars.msstage.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.UUID;
 
 @Entity
-@Table(name = "governorates",
-        uniqueConstraints = @UniqueConstraint(columnNames = "name"))
+@Table(name = "governorate", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Governorate {
 
     @Id
@@ -19,28 +26,9 @@ public class Governorate {
     @Column(nullable = false, unique = true)
     private String name;
 
+    public Governorate(String name) {
+        this.name = name.toUpperCase();
 
-    public Governorate() {}
-
-    public Governorate(UUID id, String name) {
-        this.id = id;
-        this.name = name;
     }
 
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }
