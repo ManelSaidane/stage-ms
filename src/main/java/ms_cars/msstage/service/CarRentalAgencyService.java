@@ -52,27 +52,73 @@ public class CarRentalAgencyService {
 
     public CarRentalAgency updateAgency(UpdateCarRentalRequest data) {
 
-        // same as create , don't forget to test before updating values
-        // in case user will update filename you should delete the old file from the
-        // server
-
-        CarRentalAgency old = agencyRepository.findById(data.getId())
+        CarRentalAgency agency = agencyRepository.findById(data.getId())
                 .orElseThrow(() -> new RuntimeException("Agency not found !"));
-        return old;
+
+
+        if (data.getName() != null && !data.getName().trim().isEmpty()) {
+            agency.setName(data.getName().trim());
+        }
+
+        if (data.getAddress() != null && !data.getAddress().trim().isEmpty()) {
+            agency.setAddress(data.getAddress().trim());
+        }
+
+
+        if (data.getGovernorateId() != null) {
+            Governorate governorate = governorateRepository.findById(data.getGovernorateId())
+                    .orElseThrow(() -> new RuntimeException("Governorate not found !"));
+            agency.setGovernorate(governorate);
+        }
+
+
+        if (data.getFileName() != null && !data.getFileName().trim().isEmpty()) {
+            String newFileName = data.getFileName().trim();
+
+
+            if (!fileStorageService.fileExists(newFileName)) {
+                throw new RuntimeException("Nouveau fichier logo introuvable : " + newFileName);
+            }
+
+
+            String oldLogo = agency.getLogoImage();
+            if (oldLogo != null && !oldLogo.equals(newFileName)) {
+                try {
+                    fileStorageService.deleteFile(oldLogo);
+                } catch (Exception e) {
+                 
+                    System.err.println("Impossible de supprimer l'ancien logo : " + oldLogo);
+
+                }
+            }
+
+
+            agency.setLogoImage(newFileName);
+        }
+
+
+        return agencyRepository.save(agency);
     }
 
     public void deleteAgency(UUID id) {
-        if (agencyRepository.existsById(id)) {
-            agencyRepository.findById(id).ifPresent(agency -> {
-                if (agency.getLogoImage() != null) {
-                    // deleteOldLogo(agency.getLogoImage());
-                    // move this function to filestorage service
-                }
-            });
 
-            agencyRepository.deleteById(id);
+        CarRentalAgency agency = agencyRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Agency not found !"));
 
+
+        if (agency.getLogoImage() != null) {
+            try {
+                fileStorageService.deleteFile(agency.getLogoImage());
+            } catch (Exception e) {
+
+                System.err.println("Impossible de supprimer le logo : " + agency.getLogoImage());
+
+            }
         }
+
+
+        agencyRepository.delete(agency);
+
     }
 
 }

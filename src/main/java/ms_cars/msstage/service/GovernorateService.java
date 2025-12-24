@@ -55,4 +55,8 @@ public class GovernorateService {
         }
     }
 
+    public List<Governorate> getAllGovernorates() {
+        return governorateRepository.findAll();
+    }
+
 }

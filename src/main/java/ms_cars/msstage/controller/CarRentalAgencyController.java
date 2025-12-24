@@ -4,8 +4,10 @@ import ms_cars.msstage.dto.requests.CreateCarRentalAgencyRequest;
 import ms_cars.msstage.dto.requests.UpdateCarRentalRequest;
 import ms_cars.msstage.dto.responses.ApiResponse;
 import ms_cars.msstage.entity.CarRentalAgency;
+import ms_cars.msstage.entity.Governorate;
 import ms_cars.msstage.service.CarRentalAgencyService;
 
+import ms_cars.msstage.service.GovernorateService;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.AllArgsConstructor;
@@ -19,7 +21,7 @@ import java.util.UUID;
 public class CarRentalAgencyController {
 
     private final CarRentalAgencyService agencyService;
-
+    private final GovernorateService governorateService;
     /**
      * Create a new agency
      */
@@ -81,5 +83,10 @@ public class CarRentalAgencyController {
         } catch (RuntimeException e) {
             return ApiResponse.error(e.getMessage());
         }
+    }
+
+    @GetMapping("/gouv")
+    public List<Governorate> getAll() {
+        return governorateService.getAllGovernorates();
     }
 }

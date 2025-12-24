@@ -6,6 +6,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,7 +18,7 @@ public class FileStorageService {
     private final Path uploadDir;
 
     public FileStorageService(@Value("${file.upload-dir}") String uploadDir) throws IOException {
-        this.uploadDir = Paths.get(uploadDir).toAbsolutePath().normalize();
+        this.uploadDir = Paths.get(uploadDir).toAbsolutePath().normalize(); //"Paths.get():"Converts the string path into a path object
         // Create folder if it doesn't exist
         Files.createDirectories(this.uploadDir);
     }
@@ -54,5 +55,28 @@ public class FileStorageService {
     public boolean fileExists(String fileName) {
         Path filePath = getFilePath(fileName);
         return Files.exists(filePath) && Files.isRegularFile(filePath);
+    }
+
+    public void deleteFile(String fileName) throws IOException {
+        if (fileName == null || fileName.trim().isEmpty()) {
+            return; // Rien à faire si pas de nom fourni
+        }
+
+
+        Path filePath = uploadDir.resolve(fileName.trim()).normalize();
+
+        try {
+
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+                System.out.println("Fichier supprimé avec succès : " + filePath);
+            } else {
+                System.out.println("Le fichier n'existe pas, suppression ignorée : " + filePath);
+            }
+        } catch (DirectoryNotEmptyException e) {
+            throw new IOException("Impossible de supprimer : le chemin est un dossier non vide - " + filePath, e);
+        } catch (IOException e) {
+            throw new IOException("Erreur lors de la suppression du fichier : " + filePath, e);
+        }
     }
 }
