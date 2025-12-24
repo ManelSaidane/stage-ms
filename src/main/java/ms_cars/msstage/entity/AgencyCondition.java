@@ -1,9 +1,6 @@
 package ms_cars.msstage.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.UUID;
@@ -35,5 +32,9 @@ public class AgencyCondition {
     private String returnLocation;
     private String pickupTime;
     private String returnTime;
+
+
+    @OneToOne(mappedBy = "condition")
+    private CarRentalAgency agency;
 }
 

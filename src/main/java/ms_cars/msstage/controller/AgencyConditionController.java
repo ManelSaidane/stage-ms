@@ -35,7 +35,7 @@ public class AgencyConditionController {
         return service.getByAgency(agencyId);
     }
 
-    
+
     @DeleteMapping("/{condId}")
     public void delete(@PathVariable UUID condId) {
         service.delete(condId);
