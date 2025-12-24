@@ -8,6 +8,9 @@ import ms_cars.msstage.entity.Governorate;
 import ms_cars.msstage.repository.CarRentalAgencyRepository;
 import ms_cars.msstage.repository.GovernorateRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -40,7 +43,11 @@ public class CarRentalAgencyService {
 
     }
 
-    public ApiResponse<List<CarRentalAgency>> getAllAgencies() {
+
+    public ApiResponse<Page<CarRentalAgency>> getAllAgencies(int page, int size) {
+        Page<CarRentalAgency> agenciesPage = agencyRepository.findAll(PageRequest.of(page, size));
+        return ApiResponse.ok(agenciesPage, "Agencies fetched successfully");
+    }    public ApiResponse<List<CarRentalAgency>> getAllAgencies() {
         return ApiResponse.ok(agencyRepository.findAll());
     }
 
@@ -86,7 +93,7 @@ public class CarRentalAgencyService {
                 try {
                     fileStorageService.deleteFile(oldLogo);
                 } catch (Exception e) {
-                 
+
                     System.err.println("Impossible de supprimer l'ancien logo : " + oldLogo);
 
                 }
@@ -120,5 +127,53 @@ public class CarRentalAgencyService {
         agencyRepository.delete(agency);
 
     }
+
+    // Service
+    public Page<CarRentalAgency> byName(String name, int page, int size) {
+        List<CarRentalAgency> all = agencyRepository.findAll();
+        List<CarRentalAgency> filtered = all.stream()
+                .filter(a -> a.getName().toLowerCase().contains(name.toLowerCase()))
+                .toList();
+
+        int start = page * size;
+        int end = Math.min(start + size, filtered.size());
+        return new PageImpl<>(filtered.subList(start, end), PageRequest.of(page, size), filtered.size());
+    }
+
+    public Page<CarRentalAgency> byAddr(String addr, int page, int size) {
+        List<CarRentalAgency> all = agencyRepository.findAll();
+        List<CarRentalAgency> filtered = all.stream()
+                .filter(a -> a.getAddress().toLowerCase().contains(addr.toLowerCase()))
+                .toList();
+
+        int start = page * size;
+        int end = Math.min(start + size, filtered.size());
+        return new PageImpl<>(filtered.subList(start, end), PageRequest.of(page, size), filtered.size());
+    }
+
+    public Page<CarRentalAgency> byGov(String gov, int page, int size) {
+        List<CarRentalAgency> all = agencyRepository.findAll();
+        List<CarRentalAgency> filtered = all.stream()
+                .filter(a -> a.getGovernorate().getName().toLowerCase().contains(gov.toLowerCase()))
+                .toList();
+
+        int start = page * size;
+        int end = Math.min(start + size, filtered.size());
+        return new PageImpl<>(filtered.subList(start, end), PageRequest.of(page, size), filtered.size());
+    }
+
+    public Page<CarRentalAgency> filter(String name, String addr, String gov, int page, int size) {
+        List<CarRentalAgency> all = agencyRepository.findAll();
+        List<CarRentalAgency> filtered = all.stream()
+                .filter(a -> (name == null || a.getName().toLowerCase().contains(name.toLowerCase())))
+                .filter(a -> (addr == null || a.getAddress().toLowerCase().contains(addr.toLowerCase())))
+                .filter(a -> (gov == null || a.getGovernorate().getName().toLowerCase().contains(gov.toLowerCase())))
+                .toList();
+
+        int start = page * size;
+        int end = Math.min(start + size, filtered.size());
+        return new PageImpl<>(filtered.subList(start, end), PageRequest.of(page, size), filtered.size());
+    }
+
 
 }

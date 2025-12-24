@@ -8,6 +8,7 @@ import ms_cars.msstage.entity.Governorate;
 import ms_cars.msstage.service.CarRentalAgencyService;
 
 import ms_cars.msstage.service.GovernorateService;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.AllArgsConstructor;
@@ -89,4 +90,75 @@ public class CarRentalAgencyController {
     public List<Governorate> getAll() {
         return governorateService.getAllGovernorates();
     }
+
+
+    @GetMapping("/pagination")
+    public ApiResponse<Page<CarRentalAgency>> getAllAgencies(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        try {
+            return agencyService.getAllAgencies(page, size);
+        } catch (RuntimeException e) {
+            return ApiResponse.error(e.getMessage());
+        }
+    }
+
+
+
+    // 🔍 filtrer par nom
+    @GetMapping("/filter/name")
+    public ApiResponse<Page<CarRentalAgency>> byName(
+            @RequestParam String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ApiResponse.ok(
+                agencyService.byName(name, page, size)
+        );
+    }
+
+
+    // 🔍 filtrer par adresse
+    @GetMapping("/filter/address")
+    public ApiResponse<Page<CarRentalAgency>> byAddress(
+            @RequestParam String addr,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ApiResponse.ok(
+                agencyService.byAddr(addr, page, size)
+        );
+    }
+
+
+    // 🔍 filtrer par gouvernorat
+    @GetMapping("/filter/gov")
+    public ApiResponse<Page<CarRentalAgency>> byGov(
+            @RequestParam String gov,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ApiResponse.ok(
+                agencyService.byGov(gov, page, size)
+        );
+    }
+
+
+
+    // 🔍 filtrer par tous (name + addr + gov)
+    @GetMapping("/filter")
+    public ApiResponse<Page<CarRentalAgency>> filter(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String addr,
+            @RequestParam(required = false) String gov,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ApiResponse.ok(
+                agencyService.filter(name, addr, gov, page, size)
+        );
+    }
+
+
 }

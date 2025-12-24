@@ -26,6 +26,9 @@ public class Governorate {
     @Column(nullable = false, unique = true)
     private String name;
 
+
+
+
     public Governorate(String name) {
         this.name = name.toUpperCase();
 

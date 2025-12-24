@@ -30,6 +30,11 @@ public class CarRentalAgency {
     @Column(name = "logo_image")
     private String logoImage;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "condition_id")
+    private AgencyCondition condition;
+
+
     public CarRentalAgency() {
     }
 
