@@ -29,7 +29,7 @@ public class Location {
     @Column(name = "full_country", nullable = false)
     private boolean fullCountry;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "governorate_id")
     private Governorate governorate;
 

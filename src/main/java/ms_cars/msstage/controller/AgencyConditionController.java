@@ -3,11 +3,14 @@ package ms_cars.msstage.controller;
 import lombok.AllArgsConstructor;
 import ms_cars.msstage.dto.requests.AgencyConditionRequest;
 import ms_cars.msstage.entity.AgencyCondition;
+import ms_cars.msstage.entity.Location;
 import ms_cars.msstage.service.AgencyConditionService;
+import ms_cars.msstage.service.LocationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -16,7 +19,7 @@ import java.util.UUID;
 public class AgencyConditionController {
 
     private final AgencyConditionService service;
-
+    private final LocationService locationService;
     // CREATE condition for agency
     @PostMapping("/{agencyId}")
     public ResponseEntity<AgencyCondition> create(
@@ -55,5 +58,12 @@ public class AgencyConditionController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID condId) {
         service.delete(condId);
+    }
+
+
+    @GetMapping("/locations")
+    public ResponseEntity<List<Location>> getAllLocations() {
+        List<Location> locations = locationService.getAllLocations();
+        return ResponseEntity.ok(locations);
     }
 }
