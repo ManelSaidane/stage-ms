@@ -45,11 +45,12 @@ public class CarRentalAgencyService {
 
     }
 
-
     public ApiResponse<Page<CarRentalAgency>> getAllAgencies(int page, int size) {
         Page<CarRentalAgency> agenciesPage = agencyRepository.findAll(PageRequest.of(page, size));
         return ApiResponse.ok(agenciesPage, "Agencies fetched successfully");
-    }    public ApiResponse<List<CarRentalAgency>> getAllAgencies() {
+    }
+
+    public ApiResponse<List<CarRentalAgency>> getAllAgencies() {
         return ApiResponse.ok(agencyRepository.findAll());
     }
 
@@ -64,7 +65,6 @@ public class CarRentalAgencyService {
         CarRentalAgency agency = agencyRepository.findById(data.getId())
                 .orElseThrow(() -> new RuntimeException("Agency not found !"));
 
-
         if (data.getName() != null && !data.getName().trim().isEmpty()) {
             agency.setName(data.getName().trim());
         }
@@ -73,22 +73,18 @@ public class CarRentalAgencyService {
             agency.setAddress(data.getAddress().trim());
         }
 
-
         if (data.getGovernorateId() != null) {
             Governorate governorate = governorateRepository.findById(data.getGovernorateId())
                     .orElseThrow(() -> new RuntimeException("Governorate not found !"));
             agency.setGovernorate(governorate);
         }
 
-
         if (data.getFileName() != null && !data.getFileName().trim().isEmpty()) {
             String newFileName = data.getFileName().trim();
-
 
             if (!fileStorageService.fileExists(newFileName)) {
                 throw new RuntimeException("Nouveau fichier logo introuvable : " + newFileName);
             }
-
 
             String oldLogo = agency.getLogoImage();
             if (oldLogo != null && !oldLogo.equals(newFileName)) {
@@ -101,10 +97,8 @@ public class CarRentalAgencyService {
                 }
             }
 
-
             agency.setLogoImage(newFileName);
         }
-
 
         return agencyRepository.save(agency);
     }
@@ -113,7 +107,6 @@ public class CarRentalAgencyService {
 
         CarRentalAgency agency = agencyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Agency not found !"));
-
 
         if (agency.getLogoImage() != null) {
             try {
@@ -125,7 +118,6 @@ public class CarRentalAgencyService {
             }
         }
 
-
         agencyRepository.delete(agency);
 
     }
@@ -135,11 +127,9 @@ public class CarRentalAgencyService {
             String address,
             String governorate,
             int page,
-            int size
-    ) {
+            int size) {
         Pageable pageable = PageRequest.of(page, size);
         return carRentalAgencyRepository.search(name, address, governorate, pageable);
     }
-
 
 }

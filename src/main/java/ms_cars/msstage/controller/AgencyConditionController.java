@@ -9,6 +9,7 @@ import ms_cars.msstage.service.LocationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,16 +21,21 @@ public class AgencyConditionController {
 
     private final AgencyConditionService service;
     private final LocationService locationService;
+
     // CREATE condition for agency
     @PostMapping("/{agencyId}")
     public ResponseEntity<AgencyCondition> create(
-            @PathVariable UUID agencyId,
+            @PathVariable String agencyId,
             @RequestBody AgencyConditionRequest r) {
 
-        return new ResponseEntity<>(
-                service.create(agencyId, r),
-                HttpStatus.CREATED
-        );
+        UUID uuid;
+        try {
+            uuid = UUID.fromString(agencyId);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid UUID format");
+        }
+
+        return new ResponseEntity<>(service.create(uuid, r), HttpStatus.CREATED);
     }
 
     // UPDATE condition
@@ -39,8 +45,7 @@ public class AgencyConditionController {
             @RequestBody AgencyConditionRequest r) {
 
         return ResponseEntity.ok(
-                service.update(condId, r)
-        );
+                service.update(condId, r));
     }
 
     // GET condition by agency
@@ -49,8 +54,7 @@ public class AgencyConditionController {
             @PathVariable UUID agencyId) {
 
         return ResponseEntity.ok(
-                service.getByAgency(agencyId)
-        );
+                service.getByAgency(agencyId));
     }
 
     // DELETE condition
@@ -59,7 +63,6 @@ public class AgencyConditionController {
     public void delete(@PathVariable UUID condId) {
         service.delete(condId);
     }
-
 
     @GetMapping("/locations")
     public ResponseEntity<List<Location>> getAllLocations() {

@@ -8,9 +8,7 @@ import ms_cars.msstage.entity.Governorate;
 import ms_cars.msstage.service.CarRentalAgencyService;
 
 import ms_cars.msstage.service.GovernorateService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.AllArgsConstructor;
@@ -25,7 +23,6 @@ public class CarRentalAgencyController {
 
     private final CarRentalAgencyService agencyService;
     private final GovernorateService governorateService;
-
 
     /**
      * Create a new agency
@@ -95,12 +92,10 @@ public class CarRentalAgencyController {
         return governorateService.getAllGovernorates();
     }
 
-
     @GetMapping("/pagination")
     public ApiResponse<Page<CarRentalAgency>> getAllAgencies(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size) {
         try {
             return agencyService.getAllAgencies(page, size);
         } catch (RuntimeException e) {
@@ -108,16 +103,13 @@ public class CarRentalAgencyController {
         }
     }
 
-
-
     @GetMapping("/search")
     public ApiResponse<Page<CarRentalAgency>> search(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String address,
             @RequestParam(required = false) String governorate,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size) {
         try {
             Page<CarRentalAgency> result = agencyService.searchAgencies(name, address, governorate, page, size);
             return ApiResponse.ok(result, "Agencies filtered successfully");
@@ -125,8 +117,5 @@ public class CarRentalAgencyController {
             return ApiResponse.error(e.getMessage());
         }
     }
-
-
-
 
 }

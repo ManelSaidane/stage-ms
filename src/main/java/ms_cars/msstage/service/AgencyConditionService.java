@@ -1,11 +1,16 @@
 package ms_cars.msstage.service;
 
 import lombok.AllArgsConstructor;
+import ms_cars.msstage.dto.mapper.LocationMapper;
 import ms_cars.msstage.dto.requests.AgencyConditionRequest;
 import ms_cars.msstage.entity.AgencyCondition;
 import ms_cars.msstage.entity.CarRentalAgency;
+import ms_cars.msstage.entity.Location;
 import ms_cars.msstage.repository.AgencyConditionRepository;
 import ms_cars.msstage.repository.CarRentalAgencyRepository;
+import ms_cars.msstage.repository.GovernorateRepository;
+import ms_cars.msstage.repository.LocationRepository;
+
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -16,6 +21,9 @@ public class AgencyConditionService {
 
     private final AgencyConditionRepository repo;
     private final CarRentalAgencyRepository agencyRepo;
+    private final GovernorateRepository governorateRepository;
+    private final LocationMapper locationMapper;
+    private final LocationRepository locationRepository;
 
     public AgencyCondition create(UUID agencyId, AgencyConditionRequest r) {
 
@@ -27,14 +35,14 @@ public class AgencyConditionService {
 
         AgencyCondition c = new AgencyCondition();
 
-        //  BASIC FIELDS
+        // BASIC FIELDS
         c.setMinDriverAge(r.getMinDriverAge());
         c.setMinLicenseAge(r.getMinLicenseAge());
         c.setMinDays(r.getMinDays());
         c.setMaxKmPerDay(r.getMaxKmPerDay());
         c.setMaxKmPerDayDaysMax(r.getMaxKmPerDayDaysMax());
 
-        //EXTRA DRIVER
+        // EXTRA DRIVER
         c.setExtraDriverAllowed(r.getExtraDriverAllowed());
 
         if (Boolean.TRUE.equals(r.getExtraDriverAllowed())) {
@@ -46,10 +54,13 @@ public class AgencyConditionService {
             c.setExtraDriverMinAge(null);
             c.setExtraDriverMinLicenseAge(null);
         }
+        Location pickUp = locationRepository
+                .save(locationMapper.toEntity(r.getPickupLocation(), governorateRepository));
+        Location returnLocation = locationRepository
+                .save(locationMapper.toEntity(r.getReturnLocation(), governorateRepository));
 
-
-        c.setPickupLocation(r.getPickupLocation());
-        c.setReturnLocation(r.getReturnLocation());
+        c.setPickupLocation(pickUp);
+        c.setReturnLocation(returnLocation);
         c.setPickupTime(r.getPickupTime());
         c.setReturnTime(r.getReturnTime());
 
@@ -66,14 +77,14 @@ public class AgencyConditionService {
         AgencyCondition c = repo.findById(condId)
                 .orElseThrow(() -> new RuntimeException("Condition not found"));
 
-        //BASIC
+        // BASIC
         c.setMinDriverAge(r.getMinDriverAge());
         c.setMinLicenseAge(r.getMinLicenseAge());
         c.setMinDays(r.getMinDays());
         c.setMaxKmPerDay(r.getMaxKmPerDay());
         c.setMaxKmPerDayDaysMax(r.getMaxKmPerDayDaysMax());
 
-        //EXTRA
+        // EXTRA
         c.setExtraDriverAllowed(r.getExtraDriverAllowed());
 
         if (Boolean.TRUE.equals(r.getExtraDriverAllowed())) {
@@ -86,9 +97,8 @@ public class AgencyConditionService {
             c.setExtraDriverMinLicenseAge(null);
         }
 
-
-        c.setPickupLocation(r.getPickupLocation());
-        c.setReturnLocation(r.getReturnLocation());
+        c.setPickupLocation(locationMapper.toEntity(r.getPickupLocation(), governorateRepository));
+        c.setReturnLocation(locationMapper.toEntity(r.getReturnLocation(), governorateRepository));
         c.setPickupTime(r.getPickupTime());
         c.setReturnTime(r.getReturnTime());
 

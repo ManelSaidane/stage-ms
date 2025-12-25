@@ -4,7 +4,6 @@ import lombok.Data;
 import ms_cars.msstage.entity.Location;
 
 import java.time.LocalTime;
-import java.util.UUID;
 
 @Data
 
@@ -23,10 +22,8 @@ public class AgencyConditionRequest {
     private Integer extraDriverMinAge;
     private Integer extraDriverMinLicenseAge;
 
-    private Location pickupLocation;
-    private Location returnLocation;
-
-
+    private LocationRequest pickupLocation;
+    private LocationRequest returnLocation;
 
     private LocalTime pickupTime;
     private LocalTime returnTime;
