@@ -3,8 +3,8 @@ package ms_cars.msstage.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalTime;
 import java.util.UUID;
-
 @Entity
 @Data
 public class AgencyCondition {
@@ -13,26 +13,32 @@ public class AgencyCondition {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    private Integer minDriverAge;
+    private Integer minLicenseAge;
 
-    private int minDriverAge;
-    private int minLicenseAge;
+    private Integer minDays;
 
+    private Integer maxKmPerDay; // if this exist ,maxKmPerDayDaysMax must exist
+    private Integer maxKmPerDayDaysMax;
 
-    private int minDays;
-    private int maxKmPerDay;
+    private Boolean extraDriverAllowed; // if this exist ,extraDriverFree must exist
+    private Boolean extraDriverFree;
 
+    private Integer extraDriverMinAge;//// extraDriverAllowed is true
+    private Integer extraDriverMinLicenseAge; // extraDriverAllowed is true
 
-    private boolean extraDriverAllowed;
-    private boolean extraDriverFree;
-    private int extraDriverMinAge;
-    private int extraDriverMinLicenseAge;
+    @ManyToOne
+    @JoinColumn(name = "pickup_location_id")
+    private Location pickupLocation;
 
+    @ManyToOne
+    @JoinColumn(name = "return_location_id")
+    private Location returnLocation;
 
-    private String pickupLocation;
-    private String returnLocation;
-    private String pickupTime;
-    private String returnTime;
-
+    @Column(name = "pickup_time")
+    private LocalTime pickupTime;
+    @Column(name = "return_time")
+    private LocalTime returnTime;
 
     @OneToOne(mappedBy = "condition")
     private CarRentalAgency agency;

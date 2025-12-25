@@ -9,15 +9,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
+
 @Repository
 public interface CarRentalAgencyRepository extends JpaRepository<CarRentalAgency, UUID> {
 
     @Query("SELECT a FROM CarRentalAgency a " +
-            "WHERE (:name IS NULL OR LOWER(a.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
-            "AND (:addr IS NULL OR LOWER(a.address) LIKE LOWER(CONCAT('%', :addr, '%'))) " +
-            "AND (:gov IS NULL OR LOWER(a.governorate.name) LIKE LOWER(CONCAT('%', :gov, '%'))) ")
+            "WHERE (:name IS NULL OR UPPER(a.name) LIKE UPPER(CONCAT('%', :name, '%'))) " +
+            "AND (:address IS NULL OR UPPER(a.address) LIKE UPPER(CONCAT('%', :address, '%'))) " +
+            "AND (:governorate IS NULL OR UPPER(a.governorate.name) LIKE UPPER(CONCAT('%', :governorate, '%')))")
     Page<CarRentalAgency> search(@Param("name") String name,
-                                 @Param("addr") String addr,
-                                 @Param("gov") String gov,
+                                 @Param("address") String address,
+                                 @Param("governorate") String governorate,
                                  Pageable pageable);
 }

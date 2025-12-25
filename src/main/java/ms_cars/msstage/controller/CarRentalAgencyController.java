@@ -8,7 +8,9 @@ import ms_cars.msstage.entity.Governorate;
 import ms_cars.msstage.service.CarRentalAgencyService;
 
 import ms_cars.msstage.service.GovernorateService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.AllArgsConstructor;
@@ -23,6 +25,8 @@ public class CarRentalAgencyController {
 
     private final CarRentalAgencyService agencyService;
     private final GovernorateService governorateService;
+
+
     /**
      * Create a new agency
      */
@@ -106,59 +110,23 @@ public class CarRentalAgencyController {
 
 
 
-    // 🔍 filtrer par nom
-    @GetMapping("/filter/name")
-    public ApiResponse<Page<CarRentalAgency>> byName(
-            @RequestParam String name,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        return ApiResponse.ok(
-                agencyService.byName(name, page, size)
-        );
-    }
-
-
-    // 🔍 filtrer par adresse
-    @GetMapping("/filter/address")
-    public ApiResponse<Page<CarRentalAgency>> byAddress(
-            @RequestParam String addr,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        return ApiResponse.ok(
-                agencyService.byAddr(addr, page, size)
-        );
-    }
-
-
-    // 🔍 filtrer par gouvernorat
-    @GetMapping("/filter/gov")
-    public ApiResponse<Page<CarRentalAgency>> byGov(
-            @RequestParam String gov,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        return ApiResponse.ok(
-                agencyService.byGov(gov, page, size)
-        );
-    }
-
-
-
-    // 🔍 filtrer par tous (name + addr + gov)
-    @GetMapping("/filter")
-    public ApiResponse<Page<CarRentalAgency>> filter(
+    @GetMapping("/search")
+    public ApiResponse<Page<CarRentalAgency>> search(
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) String addr,
-            @RequestParam(required = false) String gov,
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) String governorate,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return ApiResponse.ok(
-                agencyService.filter(name, addr, gov, page, size)
-        );
+        try {
+            Page<CarRentalAgency> result = agencyService.searchAgencies(name, address, governorate, page, size);
+            return ApiResponse.ok(result, "Agencies filtered successfully");
+        } catch (RuntimeException e) {
+            return ApiResponse.error(e.getMessage());
+        }
     }
+
+
 
 
 }

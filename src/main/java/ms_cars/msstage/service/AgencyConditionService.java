@@ -17,35 +17,83 @@ public class AgencyConditionService {
     private final AgencyConditionRepository repo;
     private final CarRentalAgencyRepository agencyRepo;
 
-
     public AgencyCondition create(UUID agencyId, AgencyConditionRequest r) {
 
         CarRentalAgency agency = agencyRepo.findById(agencyId)
                 .orElseThrow(() -> new RuntimeException("Agency not found"));
 
         if (agency.getCondition() != null)
-            throw new RuntimeException("Condition already exists");
+            throw new RuntimeException("Condition already exists for this agency");
 
         AgencyCondition c = new AgencyCondition();
-        map(c, r);
+
+        //  BASIC FIELDS
+        c.setMinDriverAge(r.getMinDriverAge());
+        c.setMinLicenseAge(r.getMinLicenseAge());
+        c.setMinDays(r.getMinDays());
+        c.setMaxKmPerDay(r.getMaxKmPerDay());
+        c.setMaxKmPerDayDaysMax(r.getMaxKmPerDayDaysMax());
+
+        //EXTRA DRIVER
+        c.setExtraDriverAllowed(r.getExtraDriverAllowed());
+
+        if (Boolean.TRUE.equals(r.getExtraDriverAllowed())) {
+            c.setExtraDriverFree(r.getExtraDriverFree());
+            c.setExtraDriverMinAge(r.getExtraDriverMinAge());
+            c.setExtraDriverMinLicenseAge(r.getExtraDriverMinLicenseAge());
+        } else {
+            c.setExtraDriverFree(null);
+            c.setExtraDriverMinAge(null);
+            c.setExtraDriverMinLicenseAge(null);
+        }
+
+
+        c.setPickupLocation(r.getPickupLocation());
+        c.setReturnLocation(r.getReturnLocation());
+        c.setPickupTime(r.getPickupTime());
+        c.setReturnTime(r.getReturnTime());
 
         c = repo.save(c);
+
         agency.setCondition(c);
         agencyRepo.save(agency);
 
         return c;
     }
 
-
     public AgencyCondition update(UUID condId, AgencyConditionRequest r) {
 
         AgencyCondition c = repo.findById(condId)
                 .orElseThrow(() -> new RuntimeException("Condition not found"));
 
-        map(c, r);
+        //BASIC
+        c.setMinDriverAge(r.getMinDriverAge());
+        c.setMinLicenseAge(r.getMinLicenseAge());
+        c.setMinDays(r.getMinDays());
+        c.setMaxKmPerDay(r.getMaxKmPerDay());
+        c.setMaxKmPerDayDaysMax(r.getMaxKmPerDayDaysMax());
+
+        //EXTRA
+        c.setExtraDriverAllowed(r.getExtraDriverAllowed());
+
+        if (Boolean.TRUE.equals(r.getExtraDriverAllowed())) {
+            c.setExtraDriverFree(r.getExtraDriverFree());
+            c.setExtraDriverMinAge(r.getExtraDriverMinAge());
+            c.setExtraDriverMinLicenseAge(r.getExtraDriverMinLicenseAge());
+        } else {
+            c.setExtraDriverFree(null);
+            c.setExtraDriverMinAge(null);
+            c.setExtraDriverMinLicenseAge(null);
+        }
+
+
+        c.setPickupLocation(r.getPickupLocation());
+        c.setReturnLocation(r.getReturnLocation());
+        c.setPickupTime(r.getPickupTime());
+        c.setReturnTime(r.getReturnTime());
+
         return repo.save(c);
     }
-
 
     public AgencyCondition getByAgency(UUID agencyId) {
 
@@ -54,28 +102,11 @@ public class AgencyConditionService {
                 .getCondition();
     }
 
-
     public void delete(UUID condId) {
-        repo.deleteById(condId);
-    }
 
+        AgencyCondition c = repo.findById(condId)
+                .orElseThrow(() -> new RuntimeException("Condition not found"));
 
-    private void map(AgencyCondition c, AgencyConditionRequest r) {
-
-        c.setMinDriverAge(r.getMinDriverAge());
-        c.setMinLicenseAge(r.getMinLicenseAge());
-        c.setMinDays(r.getMinDays());
-        c.setMaxKmPerDay(r.getMaxKmPerDay());
-
-        c.setExtraDriverAllowed(r.isExtraDriverAllowed());
-        c.setExtraDriverFree(r.isExtraDriverFree());
-        c.setExtraDriverMinAge(r.getExtraDriverMinAge());
-        c.setExtraDriverMinLicenseAge(r.getExtraDriverMinLicenseAge());
-
-        c.setPickupLocation(r.getPickupLocation());
-        c.setReturnLocation(r.getReturnLocation());
-        c.setPickupTime(r.getPickupTime());
-        c.setReturnTime(r.getReturnTime());
+        repo.delete(c);
     }
 }
-

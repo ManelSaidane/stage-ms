@@ -11,6 +11,7 @@ import ms_cars.msstage.repository.GovernorateRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -24,6 +25,7 @@ public class CarRentalAgencyService {
 
     private final CarRentalAgencyRepository agencyRepository;
     private final GovernorateRepository governorateRepository;
+    private final CarRentalAgencyRepository carRentalAgencyRepository;
     private final FileStorageService fileStorageService;
 
     public CarRentalAgency createAgency(CreateCarRentalAgencyRequest data) throws RuntimeException {
@@ -128,51 +130,15 @@ public class CarRentalAgencyService {
 
     }
 
-    // Service
-    public Page<CarRentalAgency> byName(String name, int page, int size) {
-        List<CarRentalAgency> all = agencyRepository.findAll();
-        List<CarRentalAgency> filtered = all.stream()
-                .filter(a -> a.getName().toLowerCase().contains(name.toLowerCase()))
-                .toList();
-
-        int start = page * size;
-        int end = Math.min(start + size, filtered.size());
-        return new PageImpl<>(filtered.subList(start, end), PageRequest.of(page, size), filtered.size());
-    }
-
-    public Page<CarRentalAgency> byAddr(String addr, int page, int size) {
-        List<CarRentalAgency> all = agencyRepository.findAll();
-        List<CarRentalAgency> filtered = all.stream()
-                .filter(a -> a.getAddress().toLowerCase().contains(addr.toLowerCase()))
-                .toList();
-
-        int start = page * size;
-        int end = Math.min(start + size, filtered.size());
-        return new PageImpl<>(filtered.subList(start, end), PageRequest.of(page, size), filtered.size());
-    }
-
-    public Page<CarRentalAgency> byGov(String gov, int page, int size) {
-        List<CarRentalAgency> all = agencyRepository.findAll();
-        List<CarRentalAgency> filtered = all.stream()
-                .filter(a -> a.getGovernorate().getName().toLowerCase().contains(gov.toLowerCase()))
-                .toList();
-
-        int start = page * size;
-        int end = Math.min(start + size, filtered.size());
-        return new PageImpl<>(filtered.subList(start, end), PageRequest.of(page, size), filtered.size());
-    }
-
-    public Page<CarRentalAgency> filter(String name, String addr, String gov, int page, int size) {
-        List<CarRentalAgency> all = agencyRepository.findAll();
-        List<CarRentalAgency> filtered = all.stream()
-                .filter(a -> (name == null || a.getName().toLowerCase().contains(name.toLowerCase())))
-                .filter(a -> (addr == null || a.getAddress().toLowerCase().contains(addr.toLowerCase())))
-                .filter(a -> (gov == null || a.getGovernorate().getName().toLowerCase().contains(gov.toLowerCase())))
-                .toList();
-
-        int start = page * size;
-        int end = Math.min(start + size, filtered.size());
-        return new PageImpl<>(filtered.subList(start, end), PageRequest.of(page, size), filtered.size());
+    public Page<CarRentalAgency> searchAgencies(
+            String name,
+            String address,
+            String governorate,
+            int page,
+            int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return carRentalAgencyRepository.search(name, address, governorate, pageable);
     }
 
 
