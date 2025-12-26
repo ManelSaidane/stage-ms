@@ -2,6 +2,7 @@ package ms_cars.msstage.controller;
 
 import lombok.AllArgsConstructor;
 import ms_cars.msstage.dto.requests.AgencyConditionRequest;
+import ms_cars.msstage.dto.responses.ApiResponse;
 import ms_cars.msstage.entity.AgencyCondition;
 import ms_cars.msstage.entity.Location;
 import ms_cars.msstage.service.AgencyConditionService;
@@ -24,7 +25,7 @@ public class AgencyConditionController {
 
     // CREATE condition for agency
     @PostMapping("/{agencyId}")
-    public ResponseEntity<AgencyCondition> create(
+    public ResponseEntity<ApiResponse<AgencyCondition>> create(
             @PathVariable String agencyId,
             @RequestBody AgencyConditionRequest r) {
 
@@ -32,41 +33,60 @@ public class AgencyConditionController {
         try {
             uuid = UUID.fromString(agencyId);
         } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid UUID format");
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Invalid UUID format"));
         }
 
-        return new ResponseEntity<>(service.create(uuid, r), HttpStatus.CREATED);
+        AgencyCondition condition = service.create(uuid, r);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.ok(condition, "Condition created successfully"));
     }
 
     // UPDATE condition
     @PutMapping("/{condId}")
-    public ResponseEntity<AgencyCondition> update(
+    public ResponseEntity<ApiResponse<AgencyCondition>> update(
             @PathVariable UUID condId,
             @RequestBody AgencyConditionRequest r) {
 
+        AgencyCondition updated = service.update(condId, r);
         return ResponseEntity.ok(
-                service.update(condId, r));
+                ApiResponse.ok(updated, "Condition updated successfully")
+        );
     }
 
     // GET condition by agency
     @GetMapping("/agency/{agencyId}")
-    public ResponseEntity<AgencyCondition> get(
+    public ResponseEntity<ApiResponse<AgencyCondition>> get(
             @PathVariable UUID agencyId) {
 
+        AgencyCondition condition = service.getByAgency(agencyId);
+        if (condition == null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Condition not found for this agency"));
+        }
         return ResponseEntity.ok(
-                service.getByAgency(agencyId));
+                ApiResponse.ok(condition, "Agency condition retrieved")
+        );
     }
 
     // DELETE condition
     @DeleteMapping("/{condId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable UUID condId) {
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID condId) {
         service.delete(condId);
+        return ResponseEntity.ok(
+                ApiResponse.ok(null, "Condition deleted successfully")
+        );
     }
 
+    // GET all locations
     @GetMapping("/locations")
-    public ResponseEntity<List<Location>> getAllLocations() {
+    public ResponseEntity<ApiResponse<List<Location>>> getAllLocations() {
         List<Location> locations = locationService.getAllLocations();
-        return ResponseEntity.ok(locations);
+        return ResponseEntity.ok(
+                ApiResponse.ok(locations, "Locations retrieved successfully")
+        );
     }
 }

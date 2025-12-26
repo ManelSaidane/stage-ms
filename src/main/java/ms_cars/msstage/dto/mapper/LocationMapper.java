@@ -18,17 +18,17 @@ import ms_cars.msstage.repository.GovernorateRepository;
 public interface LocationMapper {
 
     @Mapping(target = "governorate", ignore = true)
-    Location toEntity(LocationRequest request, @Context GovernorateRepository governorateRepository);
-
+    Location toEntity(LocationRequest request, @Context GovernorateRepository governorateRepository); //Transform locationRequest to Location
+//when we call LocationMapper.toEntity it creat a location object automatically
     List<Location> toEntityList(
             List<LocationRequest> list,
             @Context GovernorateRepository governorateRepository);
 
-    @AfterMapping
+    @AfterMapping   //excute after mapstruct creat the location copie
     default void mapGovernorate(
             LocationRequest request,
-            @MappingTarget Location location,
-            @Context GovernorateRepository governorateRepository) {
+            @MappingTarget Location location, //object creat
+            @Context GovernorateRepository governorateRepository) { //for searching  in DB
 
         if (request.isFullCountry()) {
             location.setFullCountry(true);
